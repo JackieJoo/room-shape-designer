@@ -6,65 +6,176 @@ export class Editor extends React.Component {
     super( props );
     this.state =
     {
+      states : [],
+      action : 'no', /* tr, sq, cut */
       isReceivedWidth : false,
-      isReceivedHeight : false,
+      isReceivedDepth : false,
       scale : 10, /* normalize user input to always display same rectangle */
       lineLength :
       {
 
       },
+      range : [ 0, 1000 ], /* svg viewport range */
       roomCoordinates :
       [
-        { x: 50, y: 1000 },
-        { x: 50, y: 50 },
-        { x: 1000, y: 50 },
-        { x: 1000, y: 1000 },
+        { x: this.state.range[ 1 ] * 1.05, y: this.state.range[ 1 ] },
+        { x: this.state.range[ 1 ] * 1.05, y: this.state.range[ 1 ] * 1.05 },
+        { x: this.state.range[ 1 ], y: this.state.range[ 1 ] * 1.05 },
+        { x: this.state.range[ 1 ], y: this.state.range[ 1 ] },
       ]
     };
 
     this.handleChangeWidth = this.handleChangeWidth.bind(this);
     this.handleSubmitWidth = this.handleSubmitWidth.bind(this);
-    this.handleChangeHeight = this.handleChangeHeight.bind(this);
-    this.handleSubmitHeight = this.handleSubmitHeight.bind(this);
-    // this.drag = this.drag.bind(this);
+
+    this.handleChangeDepth = this.handleChangeDepth.bind(this);
+    this.handleSubmitDepth = this.handleSubmitDepth.bind(this);
+
+    this.addTrianularCorner = this.addTrianularCorner.bind(this);
+    this.addSquareCorner = this.addSquareCorner.bind(this);
+    this.addCutout = this.addCutout.bind(this);
+
+    this.drag = this.drag.bind(this);
   }
   
   render() {
     const points = this.state.roomCoordinates;
-    let prevCoordinate = points[ 0 ];
-    let form;
+    // `${points[ 0 ].x},${points[ 0 ].y} ${points[ 1 ].x},${points[ 1 ].y} ${points[ 2 ].x},${points[ 2 ].y} ${points[ 3 ].x},${points[ 3 ].y}`
+    let pointsStr = points.map( ( el ) => `${el.x},${el.y}` ).join( ' ' );
+    console.log( pointsStr );
 
-    if( !this.state.isReceivedWidth )
-    {
+    /* Buttons */
+
+    let addTrianular = (
+      <button id="triangle-button" onClick={this.addTrianularCorner}>
+        <b>Add triangular corner</b>
+        <svg width="200" height="100" class="triangle-icon" viewBox="0 0 200 100" role="img">
+          <polygon
+            fill="white"
+            stroke="grey"
+            strokeWidth="3"
+            points="10,90 10,40 40,20 180,20 180,90"
+            />
+        </svg>
+      </button>
+    )
+
+    let addSquare = (
+      <button id="triangle-button" onClick={this.addSquareCorner}>
+        <b>Add square corner</b>
+        <svg width="200" height="100" class="triangle-icon" viewBox="0 0 200 100" role="img">
+          <polygon
+            fill="white"
+            stroke="grey"
+            strokeWidth="3"
+            points="10,90 10,50 40,50 40,20 180,20 180,90"
+            />
+        </svg>
+      </button>
+    )
+
+    let addCutout = (
+      <button id="triangle-button" onClick={this.addCutout}>
+        <b>Add cut-out</b>
+        <svg width="200" height="100" class="triangle-icon" viewBox="0 0 200 100" role="img">
+          <polygon
+            fill="white"
+            stroke="grey"
+            strokeWidth="3"
+            points="10,90 10,50 10,20 40,20 180,20 180,90 60,90 60,50 40,50 40,90"
+            />
+        </svg>
+      </button>
+    )
+
+    /* */
+    
+    let prevCoordinate = points[ 0 ];
+    let prevCoordinate2 = points[ 0 ];
+    let form, dots;
+
+    // if( !this.state.isReceivedWidth )
+    // {
+    //   form = (
+    //     <form onSubmit={this.handleSubmitWidth}>
+    //       <label>
+    //         Please enter the room width:
+    //         <input id="width" type="text" value={this.state.value} onChange={this.handleChangeWidth} />
+    //       </label>
+    //       <input type="submit" value="Submit" />
+    //     </form>
+    //   );
+    // }
+    // else if( !this.state.isReceivedDepth )
+    // {
+    //   form = (
+    //     <form onSubmit={this.handleSubmitDepth}>
+    //       <label>
+    //         Please enter the room depth:
+    //         <input id="depth" type="text" value={this.state.value} onChange={this.handleChangeDepth} />
+    //       </label>
+    //       <input type="submit" value="Submit" />
+    //     </form>
+    //   );
+    // }
+    // else if( this.state.isReceivedWidth && this.state.isReceivedDepth )
+    // {
+      // display the menu
       form = (
-        <form onSubmit={this.handleSubmitWidth}>
-          <label>
-            Please enter the room width:
-            <input id="width" type="text" value={this.state.value} onChange={this.handleChangeWidth} />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-      );
-    }
-    else if( !this.state.isReceivedHeight )
-    {
-      form = (
-        <form onSubmit={this.handleSubmitHeight}>
-          <label>
-            Please enter the room height:
-            <input id="height" type="text" value={this.state.value} onChange={this.handleChangeHeight} />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-      );
-    }
+        <div>
+          {addTrianular}
+          {addSquare}
+          {addCutout}
+        </div>
+      )
+    // }
 
     // { x: 50, y: 1000 }, left bottom
     // { x: 50, y: 50 }, left top
     // { x: 1000, y: 50 }, right top
     // { x: 1000, y: 1000 }, right bottom
 
+    // let lines = points.map( ( el, i ) =>
+    // {
+    //   let current;
+    //   if( i > 0 )
+    //   {
+    //     // current = <line x1={prevCoordinate2.x - 40} y1={prevCoordinate2.y} x2={ el.x-40 } y2={el.y} stroke="red" strokeWidth="4" />;
+    //     // current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
+    //     prevCoordinate2=el;
+    //     return current;
+    //   }
+    //   else
+    //   {
+    //     // return <line x1={prevCoordinate2.x - 40} y1={prevCoordinate2.y - 40} x2={ el.x-40 } y2={el.y - 40} stroke="red" strokeWidth="4" />;
+    //     // return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
+    //   }
+    // })
+    // console.log( lines )
     let line = <line x1="50" y1="20" x2="1000" y2="20" stroke="darkgrey" strokeWidth="4" />;
+
+    if( this.state.action === 'triag' || this.state.action === 'square' )
+    {
+      dots = points.map( ( el, i ) => {
+        return <rect x={ el.x - 20 } y={ el.y - 20 } width="40" height="40" rx="45" fill="grey"/>;
+      });
+    }
+    else if( this.state.action === 'cut' )
+    {
+      dots = points.map( ( el, i ) => {
+        let current;
+        if( i > 0 )
+        {
+          current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
+          prevCoordinate=el;
+          return current;
+        }
+        else
+        {
+          return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
+        }
+      })
+    }
 
     return (
       <div className='editor'>
@@ -73,47 +184,43 @@ export class Editor extends React.Component {
         </div>
         <svg width="80%" viewBox="0 0 1050 1050" ref={(svg) => this.svg = svg}>
           { line }
+          {/* { lines } */}
           <polygon
           fill="white"
           stroke="grey"
           strokeWidth="4"
-          points=
-          {
-            `${points[ 0 ].x},${points[ 0 ].y} ${points[ 1 ].x},${points[ 1 ].y} ${points[ 2 ].x},${points[ 2 ].y} ${points[ 3 ].x},${points[ 3 ].y}`
-          }
+          points={pointsStr}
           ref={(e) => this.svgPolygon = e}
           onMouseDown={(e) => this.drag(e, this.svgPolygon)}
           />
-
-          {/* Lines */}
-          {
-            points.map( ( el, i ) => {
-              let current;
-              if( i > 0 )
-              {
-                current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
-                prevCoordinate=el;
-                return current;
-              }
-              else
-              {
-                console.log( '=0' )
-                return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
-              }
-            })
-          }
-
-          {/* Angles */}
-          {
-            points.map( ( el, i ) => {
-              return <rect x={ el.x - 20 } y={ el.y - 20 } width="40" height="40" rx="45" fill="grey"/>;
-            })
-          }
+          { dots }
         </svg>
       </div>
     );
-    
   }
+
+  addTrianularCorner( event )
+  {
+    event.preventDefault();
+    this.setState({ action : 'triag' });
+    console.log( this.state.action )
+  }
+
+  addSquareCorner( event )
+  {
+    event.preventDefault();
+    this.setState({ action : 'square' });
+    console.log( this.state.action )
+  }
+
+  addCutout( event )
+  {
+    event.preventDefault();
+    this.setState({ action : 'cut' });
+    console.log( this.state.action )
+  }
+
+  /* */
 
   handleChangeWidth( event )
   {
@@ -122,21 +229,22 @@ export class Editor extends React.Component {
 
   handleSubmitWidth( event )
   {
+    // clear form field after it has been submitted
     event.preventDefault();
     this.setState({ isReceivedWidth: true });
-    document.getElementByid('inputname').value = '';
     console.log( this.state );
   }
 
-  handleChangeHeight( event )
+  handleChangeDepth( event )
   {
     this.setState({ height: event.target.value });
   }
 
-  handleSubmitHeight( event )
+  handleSubmitDepth( event )
   {
+    // clear form field after it has been submitted
     event.preventDefault();
-    this.setState({ isReceivedHeight: true });
+    this.setState({ isReceivedDepth: true });
     console.log( this.state );
   }
 
@@ -272,4 +380,30 @@ export class Editor extends React.Component {
 //     document.addEventListener("mousemove", mousemove);
 //     document.addEventListener("mouseup", mouseup);
 //   };
+// }
+
+
+// {/* Dots on lines */}
+// {
+//   points.map( ( el, i ) => {
+//     let current;
+//     if( i > 0 )
+//     {
+//       current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
+//       prevCoordinate=el;
+//       return current;
+//     }
+//     else
+//     {
+//       console.log( '=0' )
+//       return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
+//     }
+//   })
+// }
+
+// {/* Angles */}
+// {
+//   points.map( ( el, i ) => {
+//     return <rect x={ el.x - 20 } y={ el.y - 20 } width="40" height="40" rx="45" fill="grey"/>;
+//   })
 // }
