@@ -2,26 +2,33 @@ import React from 'react';
 import './App.css';
 
 export class Editor extends React.Component {
-  constructor( props ) {
+  constructor( props )
+  {
     super( props );
     this.state =
     {
       states : [],
-      action : 'no', /* tr, sq, cut */
+      action : 'no', /* triag, square, cut */
       isReceivedWidth : false,
       isReceivedDepth : false,
-      scale : 10, /* normalize user input to always display same rectangle */
+      width : 1000, /* svg viewport range */
+      depth : 1000, /* svg viewport range */
       lineLength :
       {
 
       },
-      range : [ 0, 1000 ], /* svg viewport range */
+      // range : [ 0, 1000 ],
       roomCoordinates :
+      // { x: 50, y: 1000 },
+      //   { x: 50, y: 50 },
+      //   { x: 1000, y: 50 },
+      //   { x: 1000, y: 1000 },
       [
-        { x: this.state.range[ 1 ] * 1.05, y: this.state.range[ 1 ] },
-        { x: this.state.range[ 1 ] * 1.05, y: this.state.range[ 1 ] * 1.05 },
-        { x: this.state.range[ 1 ], y: this.state.range[ 1 ] * 1.05 },
-        { x: this.state.range[ 1 ], y: this.state.range[ 1 ] },
+        // use widht and depth
+        { x: 1000 * 0.05, y: 1000 },
+        { x: 1000 * 0.05, y: 1000 * 0.05 },
+        { x: 1000, y: 1000 * 0.05 },
+        { x: 1000, y: 1000 },
       ]
     };
 
@@ -35,10 +42,43 @@ export class Editor extends React.Component {
     this.addSquareCorner = this.addSquareCorner.bind(this);
     this.addCutout = this.addCutout.bind(this);
 
+    this.calculateNewCoordinates = this.calculateNewCoordinates.bind(this);
+
     this.drag = this.drag.bind(this);
   }
+
+  calculateNewCoordinates( state )
+  {
+    return (
+      [
+        { x: state.width * 0.05, y: state.depth },
+        { x: state.width * 0.05, y: state.depth * 0.05 },
+        { x: state.width, y: state.depth * 0.05 },
+        { x: state.width, y: state.depth },
+      ]
+    )
+  }
+
+  // convertToRange( number )
+  // {
+  //   /* 
+  //     old range ( permitted for user : [ 0, 1e6 ] )
+  //     new range ( used to draw svg ) : [ 0, 1000 ]
+  //   */
+  //   // OldRange = ( OldMax - OldMin )
+  //   // if (OldRange == 0)
+  //   //     NewValue = NewMin
+  //   // else
+  //   // {
+  //   //     NewRange = (NewMax - NewMin)  
+  //   //     NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
+  //   // }
+  //   console.log( 'num : ', ( ( number * 1000 ) / 1000000  ) );
+  //   return ( ( number * 1000 ) / 1000000 );
+  // }
   
-  render() {
+  render()
+  {
     const points = this.state.roomCoordinates;
     // `${points[ 0 ].x},${points[ 0 ].y} ${points[ 1 ].x},${points[ 1 ].y} ${points[ 2 ].x},${points[ 2 ].y} ${points[ 3 ].x},${points[ 3 ].y}`
     let pointsStr = points.map( ( el ) => `${el.x},${el.y}` ).join( ' ' );
@@ -49,7 +89,7 @@ export class Editor extends React.Component {
     let addTrianular = (
       <button id="triangle-button" onClick={this.addTrianularCorner}>
         <b>Add triangular corner</b>
-        <svg width="200" height="100" class="triangle-icon" viewBox="0 0 200 100" role="img">
+        <svg width="200" height="100" className="triangle-icon" viewBox="0 0 200 100" role="img">
           <polygon
             fill="white"
             stroke="grey"
@@ -63,7 +103,7 @@ export class Editor extends React.Component {
     let addSquare = (
       <button id="triangle-button" onClick={this.addSquareCorner}>
         <b>Add square corner</b>
-        <svg width="200" height="100" class="triangle-icon" viewBox="0 0 200 100" role="img">
+        <svg width="200" height="100" className="triangle-icon" viewBox="0 0 200 100" role="img">
           <polygon
             fill="white"
             stroke="grey"
@@ -77,7 +117,7 @@ export class Editor extends React.Component {
     let addCutout = (
       <button id="triangle-button" onClick={this.addCutout}>
         <b>Add cut-out</b>
-        <svg width="200" height="100" class="triangle-icon" viewBox="0 0 200 100" role="img">
+        <svg width="200" height="100" className="triangle-icon" viewBox="0 0 200 100" role="img">
           <polygon
             fill="white"
             stroke="grey"
@@ -94,32 +134,32 @@ export class Editor extends React.Component {
     let prevCoordinate2 = points[ 0 ];
     let form, dots;
 
-    // if( !this.state.isReceivedWidth )
-    // {
-    //   form = (
-    //     <form onSubmit={this.handleSubmitWidth}>
-    //       <label>
-    //         Please enter the room width:
-    //         <input id="width" type="text" value={this.state.value} onChange={this.handleChangeWidth} />
-    //       </label>
-    //       <input type="submit" value="Submit" />
-    //     </form>
-    //   );
-    // }
-    // else if( !this.state.isReceivedDepth )
-    // {
-    //   form = (
-    //     <form onSubmit={this.handleSubmitDepth}>
-    //       <label>
-    //         Please enter the room depth:
-    //         <input id="depth" type="text" value={this.state.value} onChange={this.handleChangeDepth} />
-    //       </label>
-    //       <input type="submit" value="Submit" />
-    //     </form>
-    //   );
-    // }
-    // else if( this.state.isReceivedWidth && this.state.isReceivedDepth )
-    // {
+    if( !this.state.isReceivedWidth )
+    {
+      form = (
+        <form onSubmit={this.handleSubmitWidth}>
+          <label>
+            Please enter the room width:
+            <input id="width" type="text" value={this.state.value} onChange={this.handleChangeWidth} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
+      );
+    }
+    else if( !this.state.isReceivedDepth )
+    {
+      form = (
+        <form onSubmit={this.handleSubmitDepth}>
+          <label>
+            Please enter the room depth:
+            <input id="depth" type="text" value={this.state.value} onChange={this.handleChangeDepth} />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
+      );
+    }
+    else if( this.state.isReceivedWidth && this.state.isReceivedDepth )
+    {
       // display the menu
       form = (
         <div>
@@ -128,7 +168,7 @@ export class Editor extends React.Component {
           {addCutout}
         </div>
       )
-    // }
+    }
 
     // { x: 50, y: 1000 }, left bottom
     // { x: 50, y: 50 }, left top
@@ -182,9 +222,9 @@ export class Editor extends React.Component {
         <div className='interface'>
         {form}
         </div>
-        <svg width="80%" viewBox="0 0 1050 1050" ref={(svg) => this.svg = svg}>
+        <svg width="80%" viewBox={`0 0 ${this.state.width} ${this.state.depth}`} ref={(svg) => this.svg = svg}>
           { line }
-          {/* { lines } */}
+          {/* { console.log( this.convertToRange( 1000000 ) ) } */}
           <polygon
           fill="white"
           stroke="grey"
@@ -231,20 +271,20 @@ export class Editor extends React.Component {
   {
     // clear form field after it has been submitted
     event.preventDefault();
-    this.setState({ isReceivedWidth: true });
+    this.setState( ( state ) => ( { isReceivedWidth: true, roomCoordinates : this.calculateNewCoordinates( state ) } ) );
     console.log( this.state );
   }
 
   handleChangeDepth( event )
   {
-    this.setState({ height: event.target.value });
+    this.setState({ depth: event.target.value });
   }
 
   handleSubmitDepth( event )
   {
     // clear form field after it has been submitted
     event.preventDefault();
-    this.setState({ isReceivedDepth: true });
+    this.setState( ( state ) => ( { isReceivedDepth: true, roomCoordinates : this.calculateNewCoordinates( state ) } ) );
     console.log( this.state );
   }
 
