@@ -60,24 +60,6 @@ export class Editor extends React.Component {
     )
   }
 
-  // convertToRange( number )
-  // {
-  //   /* 
-  //     old range ( permitted for user : [ 0, 1e6 ] )
-  //     new range ( used to draw svg ) : [ 0, 1000 ]
-  //   */
-  //   // OldRange = ( OldMax - OldMin )
-  //   // if (OldRange == 0)
-  //   //     NewValue = NewMin
-  //   // else
-  //   // {
-  //   //     NewRange = (NewMax - NewMin)  
-  //   //     NewValue = (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
-  //   // }
-  //   console.log( 'num : ', ( ( number * 1000 ) / 1000000  ) );
-  //   return ( ( number * 1000 ) / 1000000 );
-  // }
-  
   render()
   {
 
@@ -368,7 +350,7 @@ export class Editor extends React.Component {
       //   },
       // ]
     });
-    
+
     const mousemove = (event) =>
     {
       event.preventDefault();
