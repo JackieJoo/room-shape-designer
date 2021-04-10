@@ -21,8 +21,8 @@ export class Editor extends React.Component {
       action : 'no', /* triag, square, cut */
       isReceivedWidth : false,
       isReceivedDepth : false,
-      width : 1000, /* svg viewport range */
-      depth : 1000, /* svg viewport range */
+      width : 1000, /* svg viewport max width */
+      depth : 1000, /* svg viewport max height */
       lineLength :
       {
 
@@ -322,32 +322,13 @@ export class Editor extends React.Component {
     point.x = event.clientX;
     point.y = event.clientY;
     point = point.matrixTransform(this.svg.getScreenCTM().inverse());
-    this.setState({
-      dragOffset:
-      {
-        x: point.x - this.state.roomCoordinates[ 1 ].x,
-        y: point.y - this.state.roomCoordinates[ 1 ].y
-      }
-      // dragOffset:
-      // [
-      //   {
-      //     x: point.x - this.state.roomCoordinates[ 0 ].x,
-      //     y: point.y - this.state.roomCoordinates[ 0 ].y
-      //   },
-      //   {
-      //     x: point.x - this.state.roomCoordinates[ 1 ].x,
-      //     y: point.y - this.state.roomCoordinates[ 1 ].y
-      //   },
-      //   {
-      //     x: point.x - this.state.roomCoordinates[ 2 ].x,
-      //     y: point.y - this.state.roomCoordinates[ 2 ].y
-      //   },
-      //   {
-      //     x: point.x - this.state.roomCoordinates[ 3 ].x,
-      //     y: point.y - this.state.roomCoordinates[ 3 ].y
-      //   },
-      // ]
-    });
+    // this.setState({
+    //   dragOffset:
+    //   {
+    //     x: point.x - this.state.roomCoordinates[ 1 ].x,
+    //     y: point.y - this.state.roomCoordinates[ 1 ].y
+    //   }
+    // });
 
     const mousemove = ( event ) =>
     {
@@ -364,8 +345,8 @@ export class Editor extends React.Component {
         // let point_x = cursor.x - this.state.dragOffset.x;
         // let point_y = cursor.y - this.state.dragOffset.y;
 
-        let point_x = Math.max( Math.min( cursor.x - this.state.dragOffset.x, this.state.width * 0.95 ), this.state.width * 0.05 );
-        let point_y = Math.max( Math.min( cursor.y - this.state.dragOffset.y, this.state.depth * 0.95 ), this.state.width * 0.05 );
+        let point_x = Math.max( Math.min( cursor.x, this.state.width * 0.95 ), this.state.width * 0.05 );
+        let point_y = Math.max( Math.min( cursor.y, this.state.depth * 0.95 ), this.state.width * 0.05 );
 
         /*
           roles : bl, tl, tr, br;
@@ -391,8 +372,6 @@ export class Editor extends React.Component {
             },
             state.roomCoordinates[ state.roomCoordinates.length - 2 ],
             state.roomCoordinates[ state.roomCoordinates.length - 1 ],
-            // { x: state.roomCoordinates[ state.roomCoordinates.length - 2 ].x, y: state.roomCoordinates[ state.roomCoordinates.length - 2 ].y },
-            // { x: state.roomCoordinates[ state.roomCoordinates.length - 1 ].x, y: state.roomCoordinates[ state.roomCoordinates.length - 1 ].y },
           ]
         };
 
@@ -415,7 +394,7 @@ export class Editor extends React.Component {
               x : state.roomCoordinates[ state.roomCoordinates.length - 1 ].x,
               y : point_y
             },
-            { x: state.roomCoordinates[ state.roomCoordinates.length - 1 ].x, y: state.roomCoordinates[ state.roomCoordinates.length - 1 ].y },
+            state.roomCoordinates[ state.roomCoordinates.length - 1 ],
           ]
         };
 
