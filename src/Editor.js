@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
 
-export class Editor extends React.Component {
+export class Editor extends React.Component
+{
   constructor( props )
   {
     super( props );
@@ -130,6 +131,10 @@ export class Editor extends React.Component {
       </button>
     )
 
+    let pick = (
+      <div>Please pick a {this.state.action === 'square' || this.state.action === 'triag' ? 'Please pick a corner' : 'Please pick a wall' }</div>
+    )
+
     /* */
     
     let prevCoordinate = points[ 0 ];
@@ -168,6 +173,7 @@ export class Editor extends React.Component {
           {addTrianular}
           {addSquare}
           {addCutout}
+          {/* {pick} */}
         </div>
       )
     // }
@@ -340,6 +346,8 @@ export class Editor extends React.Component {
       this.setState( ( state ) =>
       {
 
+        let coordinates = state.roomCoordinates.slice();
+
         // let point_x = Math.max( Math.min( cursor.x, state.width ), 0 ) - this.state.dragOffset.x;
         // let point_y = Math.max( Math.min( cursor.y, state.width ), 0 ) - this.state.dragOffset.y;
         // let point_x = cursor.x - this.state.dragOffset.x;
@@ -353,96 +361,120 @@ export class Editor extends React.Component {
         */
 
         if( index === 1 )
-        /* left top corner */
-        return {
-          roomCoordinates:
-          [
-            state.roomCoordinates[ 0 ],
-            {
-              x: state.roomCoordinates[ 0 ].x,
-              y: point_y,
-            },
-            {
-              x : point_x,
-              y : point_y
-            },
-            {
-              x : point_x,
-              y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
-            },
-            state.roomCoordinates[ state.roomCoordinates.length - 2 ],
-            state.roomCoordinates[ state.roomCoordinates.length - 1 ],
-          ]
-        };
-
+        {
+          console.log( 'one' )
+          /* left top corner */
+          // coordinates.splice
+          // (
+          //   1,
+          //   0,
+          //   {
+          //     x: state.roomCoordinates[ 0 ].x,
+          //     y: point_y,
+          //   },
+          //   {
+          //     x : point_x,
+          //     y : point_y
+          //   },
+          //   {
+          //     x : point_x,
+          //     y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
+          //   }  
+          // )
+          // return { roomCoordinates : coordinates.slice() };
+          return {
+            roomCoordinates:
+            [
+              state.roomCoordinates[ 0 ],
+              {
+                x: state.roomCoordinates[ 0 ].x,
+                y: point_y,
+              },
+              {
+                x : point_x,
+                y : point_y
+              },
+              {
+                x : point_x,
+                y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
+              },
+              state.roomCoordinates[ state.roomCoordinates.length - 2 ],
+              state.roomCoordinates[ state.roomCoordinates.length - 1 ],
+            ]
+          };
+        }
         else if( index === 2 )
-        // top right corner
-        return {
-          roomCoordinates:
-          [
-            state.roomCoordinates[ 0 ],
-            state.roomCoordinates[ 1 ],
-            {
-              x: point_x,
-              y: state.roomCoordinates[ 1 ].y,
-            },
-            {
-              x : point_x,
-              y : point_y
-            },
-            {
-              x : state.roomCoordinates[ state.roomCoordinates.length - 1 ].x,
-              y : point_y
-            },
-            state.roomCoordinates[ state.roomCoordinates.length - 1 ],
-          ]
-        };
-
+        {
+          // top right corner
+          return {
+            roomCoordinates:
+            [
+              state.roomCoordinates[ 0 ],
+              state.roomCoordinates[ 1 ],
+              {
+                x: point_x,
+                y: state.roomCoordinates[ 1 ].y,
+              },
+              {
+                x : point_x,
+                y : point_y
+              },
+              {
+                x : state.roomCoordinates[ state.roomCoordinates.length - 1 ].x,
+                y : point_y
+              },
+              state.roomCoordinates[ state.roomCoordinates.length - 1 ],
+            ]
+          };
+        }
         else if( index === 3 )
-        // bottom right corner
-        return {
-          roomCoordinates:
-          [
-            state.roomCoordinates[ 0 ],
-            state.roomCoordinates[ 1 ],
-            state.roomCoordinates[ 2 ],
-            {
-              x: state.roomCoordinates[ 2 ].x,
-              y: point_y,
-            },
-            {
-              x : point_x,
-              y : point_y
-            },
-            {
-              x : point_x,
-              y : state.roomCoordinates[ state.roomCoordinates.length - 1 ].y
-            },
-          ]
-        };
-
+        {
+          // bottom right corner
+          return {
+            roomCoordinates:
+            [
+              state.roomCoordinates[ 0 ],
+              state.roomCoordinates[ 1 ],
+              state.roomCoordinates[ 2 ],
+              {
+                x: state.roomCoordinates[ 2 ].x,
+                y: point_y,
+              },
+              {
+                x : point_x,
+                y : point_y
+              },
+              {
+                x : point_x,
+                y : state.roomCoordinates[ state.roomCoordinates.length - 1 ].y
+              },
+            ]
+          };
+        }
         else if( index === 0 )
-        // bottom left corner
-        return {
-          roomCoordinates:
-          [
-            {
-              x: point_x,
-              y: state.roomCoordinates[ state.roomCoordinates.length - 1 ].y,
-            },
-            {
-              x : point_x,
-              y : point_y
-            },
-            {
-              x: state.roomCoordinates[ state.roomCoordinates.length - 3 ].x,
-              y: point_y,
-            },
-            state.roomCoordinates[ state.roomCoordinates.length - 3 ],
-            state.roomCoordinates[ state.roomCoordinates.length - 2 ],
-            state.roomCoordinates[ state.roomCoordinates.length - 1 ],
-          ]
-        };
+        {
+          // bottom left corner
+          return {
+            roomCoordinates:
+            [
+              {
+                x: point_x,
+                y: state.roomCoordinates[ state.roomCoordinates.length - 1 ].y,
+              },
+              {
+                x : point_x,
+                y : point_y
+              },
+              {
+                x: state.roomCoordinates[ state.roomCoordinates.length - 3 ].x,
+                y: point_y,
+              },
+              state.roomCoordinates[ state.roomCoordinates.length - 3 ],
+              state.roomCoordinates[ state.roomCoordinates.length - 2 ],
+              state.roomCoordinates[ state.roomCoordinates.length - 1 ],
+            ]
+          };
+        }
 
         // return coordinates;
       });
@@ -512,9 +544,6 @@ export class Editor extends React.Component {
   // }
 
 }
-
-
-
 
 class Sample extends React.Component {
   constructor() {
