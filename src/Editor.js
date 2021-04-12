@@ -8,7 +8,6 @@ export class Editor extends React.Component
     super( props );
     this.state =
     {
-      initialized : false,
       corner : 'bl', /* bl, tl, tr, br */
       corners : [],
       states :
@@ -28,13 +27,7 @@ export class Editor extends React.Component
       width : 1000, /* svg viewport max width */
       depth : 1000, /* svg viewport max height */
       roomCoordinates :
-      // { x: 50, y: 1000 },
-      //   { x: 50, y: 50 },
-      //   { x: 1000, y: 50 },
-      //   { x: 1000, y: 1000 },
       [
-        // use width and depth
-        // only points with order properties can be dragged
         { x: 1000 * 0.05, y: 1000 * 0.95 },
         { x: 1000 * 0.05, y: 1000 * 0.05 },
         { x: 1000 * 0.95, y: 1000 * 0.05 },
@@ -76,15 +69,12 @@ export class Editor extends React.Component
 
     // push current state to the states array
 
-    debugger
     const points = this.state.roomCoordinates;
     const width = this.state.width;
     const depth = this.state.depth;
-    // `${points[ 0 ].x},${points[ 0 ].y} ${points[ 1 ].x},${points[ 1 ].y} ${points[ 2 ].x},${points[ 2 ].y} ${points[ 3 ].x},${points[ 3 ].y}`
     let pointsStr = points.map( ( el ) => el !== null ? `${el.x},${el.y}` : '' ).join( ' ' );
     console.log( pointsStr );
     console.log( this.state );
-    // console.log( this.state.roomCoordinates.toString() === this.state.states[ 0 ].toString() );
 
     /* Buttons */
 
@@ -102,9 +92,6 @@ export class Editor extends React.Component
       </button>
     )
 
-    // let addSquare;
-    // if( this.state.action === 'square' )
-    // {
       let addSquare = (
         <button id="triangle-button" onClick={this.addSquareCorner}>
           <b>Add square corner</b>
@@ -118,8 +105,6 @@ export class Editor extends React.Component
           </svg>
         </button>
       )
-
-    // }
 
     let addCutout = (
       <button id="triangle-button" onClick={this.addCutoutCorner}>
@@ -148,13 +133,12 @@ export class Editor extends React.Component
         </label>
         <input type="submit" value="Submit" />
       </form>
-      // {/* <div>Please pick a {this.state.action === 'square' || this.state.action === 'triag' ? 'corner' : 'wall' }</div> */}
     )
 
     /* */
     
     let prevCoordinate = points[ 0 ];
-    let form, changeWidth, changeDepth, displayButtons, pickCorner, dots;
+    let changeWidth, changeDepth, displayButtons, pickCorner, dots;
 
     // if( !this.state.isReceivedWidth )
     // {
@@ -198,45 +182,17 @@ export class Editor extends React.Component
         </div>
       )
 
-    // }
-
-    // { x: 50, y: 1000 }, left bottom
-    // { x: 50, y: 50 }, left top
-    // { x: 1000, y: 50 }, right top
-    // { x: 1000, y: 1000 }, right bottom
-
-    // let lines = points.map( ( el, i ) =>
-    // {
-    //   let current;
-    //   if( i > 0 )
-    //   {
-    //     // current = <line x1={prevCoordinate2.x - 40} y1={prevCoordinate2.y} x2={ el.x-40 } y2={el.y} stroke="red" strokeWidth="4" />;
-    //     // current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
-    //     prevCoordinate2=el;
-    //     return current;
-    //   }
-    //   else
-    //   {
-    //     // return <line x1={prevCoordinate2.x - 40} y1={prevCoordinate2.y - 40} x2={ el.x-40 } y2={el.y - 40} stroke="red" strokeWidth="4" />;
-    //     // return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
-    //   }
-    // })
-    // console.log( lines )
-    // let line = <line x1="50" y1="20" x2="1000" y2="20" stroke="darkgrey" strokeWidth="4" />;
-
     if( this.state.action === 'triag' )
     {
       dots = points.map( ( el, i ) => {
         // return <rect x={ el.x - 20 } y={ el.y - 20 } width="40" height="40" rx="45" fill="grey"/>;
         return <rect x={ el.x - ( width * 0.04 / 2 ) } y={ el.y - ( width * 0.04 / 2 ) } width={ Math.min( width, depth ) * 0.04 } height={ Math.min( width, depth ) * 0.04 } rx="45" fill="grey"/>;
       });
-      // console.log( dots )
     }
     else if( this.state.action === 'square' )
     {
       dots = points.map( ( el, i ) =>
       {
-        if( el !== null )
         return <rect x={ el.x - ( width * 0.04 / 2 ) } y={ el.y - ( width * 0.04 / 2 ) } width={ Math.min( width, depth ) * 0.04 } height={ Math.min( width, depth ) * 0.04 } fill="grey" onMouseDown={ ( e ) => this.dragSquareCorner( e, i, this.svgPolygon ) } />;
       });
     }
@@ -246,14 +202,12 @@ export class Editor extends React.Component
         let current;
         if( i > 0 )
         {
-          // current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
           current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - ( width * 0.04 / 2 ) } y={( prevCoordinate.y + el.y ) / 2 - ( width * 0.04 / 2 ) } width={ Math.min( width, depth ) * 0.04 } height={ Math.min( width, depth ) * 0.04 } rx="15" fill="grey"/>;
           prevCoordinate=el;
           return current;
         }
         else
         {
-          // return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
           return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - ( width * 0.04 / 2 ) } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - ( width * 0.04 / 2 ) } width={ Math.min( width, depth ) * 0.04 } height={ Math.min( width, depth ) * 0.04 } rx="15" fill="grey"/>;
         }
       })
@@ -273,14 +227,12 @@ export class Editor extends React.Component
         {/* { states } */}
         </div>
         <svg width="100%" viewBox={`0 0 ${this.state.width} ${this.state.depth}`} ref={(svg) => this.svg = svg}>
-          {/* { line } */}
           <polygon
           fill="white"
           stroke="grey"
           strokeWidth={ Math.min( this.state.width, this.state.depth ) * 0.004 }
           points={pointsStr}
           ref={(e) => this.svgPolygon = e}
-          // onMouseDown={(e) => this.drag(e, this.svgPolygon)}
           />
           { dots }
         </svg>
@@ -299,16 +251,13 @@ export class Editor extends React.Component
     event.preventDefault();
     this.setState( ( state ) =>
     {
-      debugger;
       if( JSON.stringify( state.roomCoordinates ) === JSON.stringify( state.states[ state.states.length - 1 ] ) ) /* nothing changed */
       return state;
       else
       return {
         states : [ ...state.states, state.roomCoordinates ],
-        // actions : [ ...state.actions, { [ state.corner ] : state.action } ],
         actions : { ...state.actions, [ state.corner ] : state.action },
         corners : [ ...state.corners, state.corner ],
-        states : [ ... state.states, state.roomCoordinates ]
       }
     })
   }
@@ -359,49 +308,25 @@ export class Editor extends React.Component
     this.setState( ( state ) => ( { isReceivedDepth: true, roomCoordinates : this.calculateNewCoordinates( state ), states : [ this.calculateNewCoordinates( state ) ] } ) );
   }
 
-  // roomCoordinates :
-  // [
-  //   { x: 50, y: 1000 },
-  //   { x: 50, y: 50 },
-  //   { x: 1000, y: 50 },
-  //   { x: 1000, y: 1000 },
-  // ]
-
   /* */
 
   dragSquareCorner( event, index, draggedElem )
   {
-    debugger
     event.preventDefault();
     let point = this.svg.createSVGPoint();
     point.x = event.clientX;
     point.y = event.clientY;
     point = point.matrixTransform( this.svg.getScreenCTM().inverse() );
-    // this.setState({
-    //   dragOffset:
-    //   {
-    //     x: point.x - this.state.roomCoordinates[ 1 ].x,
-    //     y: point.y - this.state.roomCoordinates[ 1 ].y
-    //   }
-    // });
 
     const mousemove = ( event ) =>
     {
-      // let coordinates = { roomCoordinates : [] };
       event.preventDefault();
-      console.log( 'event', event )
       point.x = event.clientX;
       point.y = event.clientY;
       let cursor = point.matrixTransform( this.svg.getScreenCTM().inverse() );
+
       this.setState( ( state ) =>
       {
-
-        let coordinates = state.roomCoordinates.slice();
-
-        // let point_x = Math.max( Math.min( cursor.x, state.width ), 0 ) - this.state.dragOffset.x;
-        // let point_y = Math.max( Math.min( cursor.y, state.width ), 0 ) - this.state.dragOffset.y;
-        // let point_x = cursor.x - this.state.dragOffset.x;
-        // let point_y = cursor.y - this.state.dragOffset.y;
 
         let point_x = Math.max( Math.min( cursor.x, this.state.width * 0.95 ), this.state.width * 0.05 );
         let point_y = Math.max( Math.min( cursor.y, this.state.depth * 0.95 ), this.state.width * 0.05 );
@@ -410,49 +335,29 @@ export class Editor extends React.Component
           roles : bl, tl, tr, br;
         */
 
-        // if( index === 1 )
         if( this.state.corner === 'tl' )
         {
-          // coordinates.splice
-          // (
-          //   1,
-          //   0,
-          //   {
-          //     x: state.roomCoordinates[ 0 ].x,
-          //     y: point_y,
-          //   },
-          //   {
-          //     x : point_x,
-          //     y : point_y
-          //   },
-          //   {
-          //     x : point_x,
-          //     y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
-          //   }  
-          // )
-          // console.log( 'coord', coordinates );
-          // return { roomCoordinates : coordinates };
           /* left top corner */
           return {
-            roomCoordinates: calculateLeftTopCornerSquare( state, point_x, point_y )
-
-            // [
-            //   state.roomCoordinates[ 0 ],
-            //   {
-            //     x: state.roomCoordinates[ 0 ].x,
-            //     y: point_y,
-            //   },
-            //   {
-            //     x : point_x,
-            //     y : point_y
-            //   },
-            //   {
-            //     x : point_x,
-            //     y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
-            //   },
-            //   state.roomCoordinates[ state.roomCoordinates.length - 2 ],
-            //   state.roomCoordinates[ state.roomCoordinates.length - 1 ],
-            // ]
+            // roomCoordinates: calculateLeftTopCornerSquare( state, point_x, point_y )
+            roomCoordinates :
+            [
+              state.roomCoordinates[ 0 ],
+              {
+                x: state.roomCoordinates[ 0 ].x,
+                y: point_y,
+              },
+              {
+                x : point_x,
+                y : point_y
+              },
+              {
+                x : point_x,
+                y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
+              },
+              state.roomCoordinates[ state.roomCoordinates.length - 2 ],
+              state.roomCoordinates[ state.roomCoordinates.length - 1 ],
+            ]
           };
         }
         else if( this.state.corner === 'tr' )
@@ -533,125 +438,120 @@ export class Editor extends React.Component
     
     const mouseup = ( event ) =>
     {
-      // this.setState( ( state ) =>
-      // {
-      //   return { states : [ ... state.states, state.roomCoordinates ] }
-      // })
       document.removeEventListener( 'mousemove', mousemove );
       document.removeEventListener( 'mouseup', mouseup );
     };
 
-    function calculateLeftTopCornerSquare( state, point_x, point_y )
-    {
-      if /* it's the first corner to be modified */
-      (
-        state.corners.length === 0
-        || (
-          state.corners.indexOf( 'tr' ) === -1
-          && state.corners.indexOf( 'br' ) === -1 
-          && state.corners.indexOf( 'bl' ) === -1
-        )
-      )
-      {
-        return [
-          state.roomCoordinates[ 0 ],
-          {
-            x: state.roomCoordinates[ 0 ].x,
-            y: point_y,
-          },
-          {
-            x : point_x,
-            y : point_y
-          },
-          {
-            x : point_x,
-            y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
-          },
-          state.roomCoordinates[ state.roomCoordinates.length - 2 ],
-          state.roomCoordinates[ state.roomCoordinates.length - 1 ],
-        ]
-      }
-      else
-      {
-        let newLength = state.roomCoordinates.length;
-        let result = [];
-        let next = 0; /* element in the original array to take next */
-        // let corners = Object.keys( state.actions );
-        // let types = Object.values( state.actions );
-        // state.actions.forEach( ( el, i, arr ) => /* max length = 4. For each corner */
-        // {
-        debugger
-        if( state.actions.bl === undefined )
-        {
-          result.push( state.roomCoordinates[ 0 ] );
-          next = 1;
-        }
-        else if( state.actions.bl !== undefined )
-        {
-          if( state.actions.bl === 'square' )
-          {
-            result.push( state.roomCoordinates[ 0 ] );
-            result.push( state.roomCoordinates[ 1 ] );
-            result.push( state.roomCoordinates[ 2 ] );
-            next = 3;
-          }
-          /* Implement triag and cutout */
-          // return state.roomCoordinates;
-        }
+    // function calculateLeftTopCornerSquare( state, point_x, point_y )
+    // {
+    //   if /* it's the first corner to be modified */
+    //   (
+    //     state.corners.length === 0
+    //     || (
+    //       state.corners.indexOf( 'tr' ) === -1
+    //       && state.corners.indexOf( 'br' ) === -1 
+    //       && state.corners.indexOf( 'bl' ) === -1
+    //     )
+    //   )
+    //   {
+    //     return [
+    //       state.roomCoordinates[ 0 ],
+    //       {
+    //         x: state.roomCoordinates[ 0 ].x,
+    //         y: point_y,
+    //       },
+    //       {
+    //         x : point_x,
+    //         y : point_y
+    //       },
+    //       {
+    //         x : point_x,
+    //         y : state.roomCoordinates[ state.roomCoordinates.length - 2 ].y
+    //       },
+    //       state.roomCoordinates[ state.roomCoordinates.length - 2 ],
+    //       state.roomCoordinates[ state.roomCoordinates.length - 1 ],
+    //     ]
+    //   }
+    //   else
+    //   {
+    //     let newLength = state.roomCoordinates.length;
+    //     let result = [];
+    //     let next = 0; /* element in the original array to take next */
+    //     // let corners = Object.keys( state.actions );
+    //     // let types = Object.values( state.actions );
+    //     // state.actions.forEach( ( el, i, arr ) => /* max length = 4. For each corner */
+    //     // {
+    //     if( state.actions.bl === undefined )
+    //     {
+    //       result.push( state.roomCoordinates[ 0 ] );
+    //       next = 1;
+    //     }
+    //     else if( state.actions.bl !== undefined )
+    //     {
+    //       if( state.actions.bl === 'square' )
+    //       {
+    //         result.push( state.roomCoordinates[ 0 ] );
+    //         result.push( state.roomCoordinates[ 1 ] );
+    //         result.push( state.roomCoordinates[ 2 ] );
+    //         next = 3;
+    //       }
+    //       /* Implement triag and cutout */
+    //       // return state.roomCoordinates;
+    //     }
 
-        result.push({ x: result[ result.length - 1 ].x, y: point_y });
-        result.push({ x: point_x, y: point_y });
-        result.push({ x: point_x, y: state.roomCoordinates[ next ].y });
-        next++;
+    //     result.push({ x: result[ result.length - 1 ].x, y: point_y });
+    //     result.push({ x: point_x, y: point_y });
+    //     result.push({ x: point_x, y: state.roomCoordinates[ next ].y });
+    //     next++;
 
-        // next += 2;
+    //     // next += 2;
 
-        if( state.actions.tr === undefined )
-        {
-          result.push( state.roomCoordinates[ next ] );
-          next += 1;
-        }
-        else if( state.actions.tr !== undefined )
-        {
-          if( state.actions.tr === 'square' )
-          {
-            result.push( next++ );
-            result.push( next++ );
-            result.push( next++ );
-            // result.push( state.roomCoordinates[ 1 ] );
-            // result.push( state.roomCoordinates[ 2 ] );
-            next = 3;
-          }
-          /* Implement triag and cutout */
-          // return state.roomCoordinates;
-        }
+    //     if( state.actions.tr === undefined )
+    //     {
+    //       result.push( state.roomCoordinates[ next ] );
+    //       next += 1;
+    //     }
+    //     else if( state.actions.tr !== undefined )
+    //     {
+    //       if( state.actions.tr === 'square' )
+    //       {
+    //         result.push( next++ );
+    //         result.push( next++ );
+    //         result.push( next++ );
+    //         // result.push( state.roomCoordinates[ 1 ] );
+    //         // result.push( state.roomCoordinates[ 2 ] );
+    //         next = 3;
+    //       }
+    //       /* Implement triag and cutout */
+    //       // return state.roomCoordinates;
+    //     }
 
-        if( state.actions.br === undefined )
-        {
-          // result.push({ x: point_x, y: state.roomCoordinates[ next ].y });
-          result.push( state.roomCoordinates[ next ] );
-          // next += 1;
-        }
-        else if( state.actions.br !== undefined )
-        {
-          if( state.actions.br === 'square' )
-          {
-            result.push( next++ );
-            result.push( next++ );
-            result.push( next++ );
-            // result.push( state.roomCoordinates[ 1 ] );
-            // result.push( state.roomCoordinates[ 2 ] );
-            next = 3;
-          }
-          /* Implement triag and cutout */
-          // return state.roomCoordinates;
-        }
+    //     if( state.actions.br === undefined )
+    //     {
+    //       // result.push({ x: point_x, y: state.roomCoordinates[ next ].y });
+    //       result.push( state.roomCoordinates[ next ] );
+    //       // next += 1;
+    //     }
+    //     else if( state.actions.br !== undefined )
+    //     {
+    //       if( state.actions.br === 'square' )
+    //       {
+    //         result.push( next++ );
+    //         result.push( next++ );
+    //         result.push( next++ );
+    //         // result.push( state.roomCoordinates[ 1 ] );
+    //         // result.push( state.roomCoordinates[ 2 ] );
+    //         next = 3;
+    //       }
+    //       /* Implement triag and cutout */
+    //       // return state.roomCoordinates;
+    //     }
 
-       return result;
+    //    return result;
 
-        // return state.roomCoordinates
-      }
-    }
+    //     // return state.roomCoordinates
+    //   }
+    // }
 
     document.addEventListener( 'mousemove', mousemove );
     document.addEventListener( 'mouseup', mouseup );
@@ -659,88 +559,7 @@ export class Editor extends React.Component
   }
 }
 
-class Sample extends React.Component {
-  constructor() {
-    super();
-    this.state = {points: [
-      {x: 30, y: 900},
-      {x: 30, y: 30},
-      {x: 900, y: 30},
-      {x: 900, y: 900},
-    ]};
-  }
-  
-  render() {
-    const points = this.state.points;
-    return (
-      <svg viewBox="0 0 1000 1000" ref={(svg) => this.svg = svg}>
-        <path
-          d={`M ${points[0].x} ${points[0].y} C ${points[1].x} ${points[1].y}, ${points[2].x} ${points[2].y}, ${points[3].x} ${points[3].y}`}
-          fill="transparent"
-          stroke="blue"
-          strokeWidth="3"
-        />
-        <path
-          d={`M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} M ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y}`}
-          fill="transparent"
-          stroke="gray"
-          strokeWidth="2"
-        />
-        {
-          points.map((point, i) => (
-            <g transform="translate(-15, -15)">
-              <rect
-                x={point.x}
-                y={point.y}
-                key={i}
-                width="30"
-                height="30"
-                onMouseDown={(e) => this.startDrag(e, i)}
-              />
-            </g>
-          ))
-        }
-      </svg>
-    );
-  }
-  
-  startDrag = ( event, index ) =>
-  {
-    event.preventDefault();
-    
-    const mousemove = (event) => {
-      event.preventDefault();
-      let cursorPoint = this.svg.createSVGPoint();
-      cursorPoint.x = event.clientX;
-      cursorPoint.y = event.clientY;
-      cursorPoint = cursorPoint.matrixTransform(this.svg.getScreenCTM().inverse());
-      this.setState({
-        points: this.state.points.map(
-          (p, i) => (index === i ? {
-            x: Math.max(Math.min(cursorPoint.x, 1000), 0),
-            y: Math.max(Math.min(cursorPoint.y, 1000), 0)
-          } : p))
-      })
-    };
-    
-    const mouseup = ( event ) => {
-      document.removeEventListener( 'mousemove', mousemove);
-      document.removeEventListener( 'mouseup', mouseup);
-    };
-    
-    document.addEventListener( 'mousemove', mousemove);
-    document.addEventListener( 'mouseup', mouseup);
-  };
-}
-
-
-
-
-///////////////////////////////////////////////////////
-
-
-
-// export class Editor extends React.Component {
+// class Sample extends React.Component {
 //   constructor() {
 //     super();
 //     this.state = {points: [
@@ -754,43 +573,39 @@ class Sample extends React.Component {
 //   render() {
 //     const points = this.state.points;
 //     return (
-//       // <div className='editor'>
-//         <svg viewBox="0 0 3000 3000" ref={( svg ) => this.svg = svg}>
-//         {console.log( this )}
-//           <path
-//             d={`M ${points[0].x} ${points[0].y} C ${points[1].x} ${points[1].y}, ${points[2].x} ${points[2].y}, ${points[3].x} ${points[3].y}`}
-//             fill="transparent"
-//             stroke="blue"
-//             strokeWidth="3"
-//           />
-//           <path
-//             d={`M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} M ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y}`}
-//             fill="transparent"
-//             stroke="gray"
-//             strokeWidth="2"
-//           />
-//           {
-//             points.map((point, i) => (
-//               <g transform="translate(-15, -15)">
-//                 <rect
-//                   x={point.x}
-//                   y={point.y}
-//                   key={i}
-//                   width="30"
-//                   height="30"
-//                   onMouseDown={(e) => this.startDrag(e, i)}
-//                 />
-//               </g>
-//             ))
-//           }
-//         </svg>
-//       // </div>
+//       <svg viewBox="0 0 1000 1000" ref={(svg) => this.svg = svg}>
+//         <path
+//           d={`M ${points[0].x} ${points[0].y} C ${points[1].x} ${points[1].y}, ${points[2].x} ${points[2].y}, ${points[3].x} ${points[3].y}`}
+//           fill="transparent"
+//           stroke="blue"
+//           strokeWidth="3"
+//         />
+//         <path
+//           d={`M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y} M ${points[2].x} ${points[2].y} L ${points[3].x} ${points[3].y}`}
+//           fill="transparent"
+//           stroke="gray"
+//           strokeWidth="2"
+//         />
+//         {
+//           points.map((point, i) => (
+//             <g transform="translate(-15, -15)">
+//               <rect
+//                 x={point.x}
+//                 y={point.y}
+//                 key={i}
+//                 width="30"
+//                 height="30"
+//                 onMouseDown={(e) => this.startDrag(e, i)}
+//               />
+//             </g>
+//           ))
+//         }
+//       </svg>
 //     );
-
-    
 //   }
   
-//   startDrag = (event, index) => {
+//   startDrag = ( event, index ) =>
+//   {
 //     event.preventDefault();
     
 //     const mousemove = (event) => {
@@ -808,38 +623,12 @@ class Sample extends React.Component {
 //       })
 //     };
     
-//     const mouseup = (event) => {
-//       document.removeEventListener("mousemove", mousemove);
-//       document.removeEventListener("mouseup", mouseup);
+//     const mouseup = ( event ) => {
+//       document.removeEventListener( 'mousemove', mousemove);
+//       document.removeEventListener( 'mouseup', mouseup);
 //     };
     
-//     document.addEventListener("mousemove", mousemove);
-//     document.addEventListener("mouseup", mouseup);
+//     document.addEventListener( 'mousemove', mousemove);
+//     document.addEventListener( 'mouseup', mouseup);
 //   };
-// }
-
-
-// {/* Dots on lines */}
-// {
-//   points.map( ( el, i ) => {
-//     let current;
-//     if( i > 0 )
-//     {
-//       current = <rect x={ ( prevCoordinate.x + el.x ) / 2 - 25 } y={( prevCoordinate.y + el.y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
-//       prevCoordinate=el;
-//       return current;
-//     }
-//     else
-//     {
-//       console.log( '=0' )
-//       return <rect x={ ( points[ 0 ].x + points[ points.length - 1 ].x ) / 2 - 25 } y={( points[ 0 ].y + points[ points.length - 1 ].y ) / 2 - 25 } width="50" height="50" rx="15" fill="grey"/>;
-//     }
-//   })
-// }
-
-// {/* Angles */}
-// {
-//   points.map( ( el, i ) => {
-//     return <rect x={ el.x - 20 } y={ el.y - 20 } width="40" height="40" rx="45" fill="grey"/>;
-//   })
 // }
